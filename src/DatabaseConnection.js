@@ -17,6 +17,17 @@ app.post('/signup', async (req, res) => {
     }
 });
 
+// delete user by id
+app.delete('/user', async (req, res) => {
+    try {
+        const user = req.body.userId;
+        await User.findByIdAndDelete(user);
+        res.send('User deleted successfully');
+    } catch (e) {
+        res.send('Something went wrong');
+    }
+})
+
 // Get user by email
 app.get('/user', async (req, res) => {
     console.log(req.body.emailId);
