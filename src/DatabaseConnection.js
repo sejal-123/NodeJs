@@ -44,6 +44,30 @@ app.get('/user', async (req, res) => {
     }
 });
 
+// Update a user using patch
+app.patch('/user', async (req, res) => {
+    console.log(req.body);
+    try {
+        const user = await User.findByIdAndUpdate({ _id: req.body.userId}, req.body, {returnDocument: "after"});
+        console.log(user);
+        res.send('User updated successfully'); 
+    } catch(e) {
+        res.send('Something went wrong..');
+    }
+})
+
+// Update a user using put
+app.put('/user', async (req, res) => {
+    console.log(req.body);
+    try {
+        const user = await User.findByIdAndUpdate({ _id: req.body.userId}, req.body);
+        console.log(user);
+        res.send('User updated successfully'); 
+    } catch(e) {
+        res.send('Something went wrong..');
+    }
+})
+
 // Get user by id
 app.get('/userById', async (req, res) => {
     console.log(req.body.id);
