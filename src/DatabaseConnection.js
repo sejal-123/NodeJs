@@ -47,12 +47,19 @@ app.get('/user', async (req, res) => {
 // Update a user using patch
 app.patch('/user', async (req, res) => {
     console.log(req.body);
+    const data = req.body;
     try {
-        const user = await User.findByIdAndUpdate({ _id: req.body.userId}, req.body, {returnDocument: "after"});
+        // API level validations - data sanitization
+        const ALLOWED_UPDATES = ['userId', 'photoUrl', 'gender', 'age', 'skills'];
+        const isUpdateAllowed = Object.keys(data).every((k) => ALLOWED_UPDATES.includes(k));
+        if (!isUpdateAllowed) {
+            throw new Error('Update not allowed');
+        }
+        const user = await User.findByIdAndUpdate({ _id: req.body.userId}, req.body, {returnDocument: "after", runValidators: true});
         console.log(user);
         res.send('User updated successfully'); 
     } catch(e) {
-        res.send('Something went wrong..');
+        res.status(400).send('Something went wrong..' + e);
     }
 })
 
