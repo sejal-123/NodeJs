@@ -3,7 +3,12 @@ const app = express();
 const connectDB = require('./config/database')
 const User = require('./models/user');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+const {userAuthByCookies} = require('./middlewares/auth');
 
+
+app.use(cookieParser());
 // converting the json from the req body to a js object
 app.use(express.json());
 app.post('/signup', async (req, res) => {
@@ -33,15 +38,47 @@ app.post('/login', async (req, res) => {
         }
         // First param - user entered password
         // Second param - actual encrypted passwrod in database
-        const passwordDecrypt = await bcrypt.compare(password, user.password);
-        if (!passwordDecrypt) {
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (isPasswordValid) {
+            // create a jwt token
+            const token = await jwt.sign({ _id: user._id }, "DevTinder@512");
+            console.log(token);
+            res.cookie("token", token);
+            res.send('Login successful');
+        } else {
             throw new Error('Invalid credentials');
         }
-        res.send('Login successful');
     }
     catch (e) {
         res.status(400).send('Something went wrong ' + e.message);
     }
+})
+
+app.get('/profile', userAuthByCookies, async (req, res) => {
+    try {
+        // const cookies = req.cookies;
+        // const { token } = cookies;
+        // // validate token
+        // const decodeMessage = await jwt.verify(token, "DevTinder@512");
+        // const { _id } = decodeMessage;
+        // const user = await User.findById(_id);
+        const user = req.user;
+        console.log(user);
+        res.send(user);
+    } catch(e) {
+        res.status(400).send('Something went wrong');
+    }
+})
+
+app.get('/sendConnectionRequest', userAuthByCookies, (req, res) => {
+    try{
+        const user = req.user;
+        console.log(user);
+        res.send('Sending connection request...');
+    } catch(e) {
+        res.status(400).send('Something went wrong');
+    }
+    
 })
 
 // delete user by id

@@ -1,3 +1,6 @@
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+
 const adminAuth = (req, res, next) => {
     console.log('Authenticating admin from function...');
     const token = 'xyz';
@@ -18,7 +21,22 @@ const userAuth = (req, res, next) => {
     }
 };
 
+const userAuthByCookies = async (req, res, next) => {
+    try {
+        const cookies = req.cookies;
+        const { token } = cookies;
+        const decodedMessage = jwt.verify(token, 'DevTinder@512');
+        const { _id } = decodedMessage;
+        const user = await User.findById(_id);
+        req.user = user;
+        next();
+    } catch(e) {
+        res.status(400).send('Something went wrong');
+    }
+}
+
 module.exports = {
     adminAuth,
-    userAuth
+    userAuth,
+    userAuthByCookies
 }
