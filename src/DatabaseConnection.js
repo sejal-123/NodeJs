@@ -38,12 +38,14 @@ app.post('/login', async (req, res) => {
         }
         // First param - user entered password
         // Second param - actual encrypted passwrod in database
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await user.validatePassword(password);
         if (isPasswordValid) {
             // create a jwt token
-            const token = await jwt.sign({ _id: user._id }, "DevTinder@512");
+            const token = await user.getJwt();
             console.log(token);
-            res.cookie("token", token);
+            res.cookie("token", token, {
+                expires: new Date(Date.now() + 8 * 3600000)
+            });
             res.send('Login successful');
         } else {
             throw new Error('Invalid credentials');
@@ -66,7 +68,7 @@ app.get('/profile', userAuthByCookies, async (req, res) => {
         console.log(user);
         res.send(user);
     } catch(e) {
-        res.status(400).send('Something went wrong');
+        res.status(400).send('Something went wrong' + e.message);
     }
 })
 
