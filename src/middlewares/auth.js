@@ -31,7 +31,7 @@ const userAuthByCookies = async (req, res, next) => {
         req.user = user;
         next();
     } catch(e) {
-        res.status(400).send('Something went wrong');
+        res.status(400).send('Something went wrong ' + e.message);
     }
 }
 

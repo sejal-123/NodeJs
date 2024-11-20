@@ -6,82 +6,17 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const {userAuthByCookies} = require('./middlewares/auth');
+const { authRouter } = require('./routers/authRouter');
+const { profileRouter } = require('./routers/profileRouter');
+const { requestRouter } = require('./routers/requestRouter');
 
 
 app.use(cookieParser());
 // converting the json from the req body to a js object
 app.use(express.json());
-app.post('/signup', async (req, res) => {
-    console.log(req.body);
-    // creating a new instance of the User model
-    try {
-        const user = new User(req.body);
-        const password = user.password;
-        console.log(password);
-        const encryptedHash = await bcrypt.hash(password, 10)
-        user.password = encryptedHash;
-        await user.save();
-        res.send('User added successfully');
-    } catch(e) {
-        res.status(400).send('Error saving user' + e.message);
-    }
-});
-
-app.post('/login', async (req, res) => {
-    try {
-        console.log(req.body);
-        const { emailId, password } = req.body;
-        const user = await User.findOne({ emailId: emailId });
-        console.log(user);
-        if (!user) {
-            throw new Error('Invalid credentials');
-        }
-        // First param - user entered password
-        // Second param - actual encrypted passwrod in database
-        const isPasswordValid = await user.validatePassword(password);
-        if (isPasswordValid) {
-            // create a jwt token
-            const token = await user.getJwt();
-            console.log(token);
-            res.cookie("token", token, {
-                expires: new Date(Date.now() + 8 * 3600000)
-            });
-            res.send('Login successful');
-        } else {
-            throw new Error('Invalid credentials');
-        }
-    }
-    catch (e) {
-        res.status(400).send('Something went wrong ' + e.message);
-    }
-})
-
-app.get('/profile', userAuthByCookies, async (req, res) => {
-    try {
-        // const cookies = req.cookies;
-        // const { token } = cookies;
-        // // validate token
-        // const decodeMessage = await jwt.verify(token, "DevTinder@512");
-        // const { _id } = decodeMessage;
-        // const user = await User.findById(_id);
-        const user = req.user;
-        console.log(user);
-        res.send(user);
-    } catch(e) {
-        res.status(400).send('Something went wrong' + e.message);
-    }
-})
-
-app.get('/sendConnectionRequest', userAuthByCookies, (req, res) => {
-    try{
-        const user = req.user;
-        console.log(user);
-        res.send('Sending connection request...');
-    } catch(e) {
-        res.status(400).send('Something went wrong');
-    }
-    
-})
+app.use('/', authRouter);
+app.use('/', profileRouter);
+app.use('/', requestRouter);
 
 // delete user by id
 app.delete('/user', async (req, res) => {
