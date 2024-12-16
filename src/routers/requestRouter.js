@@ -52,4 +52,37 @@ requestRouter.post('/request/send/:status/:toUserId', userAuthByCookies, async (
     
 })
 
+requestRouter.post('/request/review/:status/:requestId', userAuthByCookies, async (req, res) => {
+    try {
+        const { status, requestId } = req.params;
+        const loggedInUser = req.user;
+    
+        // check if status is either accepted or rejected
+        const allowedStatus = ['accepted', 'rejected'];
+        if (!allowedStatus.includes(status)) {
+            return res.status(404).json({ message: 'Invalid status provided '});
+            // the purpose of return here is that it will not go beyond this line of function
+        }
+    
+        // check if logged in user === toUserId
+        // check if existing status of the request is interested only
+        // check if request id exists
+    
+        const connectionRequest = await ConnectionRequest.findOne({
+            _id: requestId,
+            toUserId: loggedInUser._id,
+            status: 'interested'
+        });
+        if (!connectionRequest) {
+            return res.status(404).json({ message: 'Connection request not found'});
+        }
+        connectionRequest.status = status;
+        const data = await connectionRequest.save();
+        res.json({ message: loggedInUser.firstName + ' ' + status + 'connection request', data });
+    } catch (e) {
+        res.status(400).send('ERROR' + e.message);
+    }
+    
+})
+
 module.exports = { requestRouter };
