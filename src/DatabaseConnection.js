@@ -9,6 +9,7 @@ const {userAuthByCookies} = require('./middlewares/auth');
 const { authRouter } = require('./routers/authRouter');
 const { profileRouter } = require('./routers/profileRouter');
 const { requestRouter } = require('./routers/requestRouter');
+const userRouter = require('./routers/userRouter');
 
 
 app.use(cookieParser());
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use('/', authRouter);
 app.use('/', profileRouter);
 app.use('/', requestRouter);
+app.use('/', userRouter);
 
 // delete user by id
 app.delete('/user', async (req, res) => {
