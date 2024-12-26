@@ -78,7 +78,7 @@ requestRouter.post('/request/review/:status/:requestId', userAuthByCookies, asyn
         }
         connectionRequest.status = status;
         const data = await connectionRequest.save();
-        res.json({ message: loggedInUser.firstName + ' ' + status + 'connection request', data });
+        res.json({ message: loggedInUser.firstName + ' ' + status + ' connection request', data });
     } catch (e) {
         res.status(400).send('ERROR' + e.message);
     }
