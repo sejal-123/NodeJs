@@ -96,7 +96,21 @@ userRouter.get('/user/feed', userAuthByCookies, async (req, res) => {
             message: 'ERROR: ' + e.message
         });
     }
-    
-})
+});
+
+userRouter.get('/user/getAll', async (req, res) => {
+    try {
+        const users = await User.find();
+        console.log(users);
+        res.json({
+            message: 'Data fetched successfully',
+            data: users
+        });
+    } catch(e) {
+        res.status(400).json({
+            message: 'ERROR' + e.message
+        });
+    }
+});
 
 module.exports = userRouter;

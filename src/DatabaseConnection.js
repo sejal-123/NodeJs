@@ -10,6 +10,14 @@ const { authRouter } = require('./routers/authRouter');
 const { profileRouter } = require('./routers/profileRouter');
 const { requestRouter } = require('./routers/requestRouter');
 const userRouter = require('./routers/userRouter');
+const cors = require('cors');
+
+const corsOptions = {
+    credentials: true,
+    origin: ['http://localhost:4200'] // Whitelist the domains you want to allow
+};
+
+app.use(cors(corsOptions));
 
 
 app.use(cookieParser());
