@@ -13,8 +13,11 @@ authRouter.post('/signup', async (req, res) => {
         console.log(password);
         const encryptedHash = await bcrypt.hash(password, 10)
         user.password = encryptedHash;
-        await user.save();
-        res.send('User added successfully');
+        const data = await user.save();
+        res.json({
+            message: 'User added successfully',
+            data 
+        });
     } catch(e) {
         res.status(400).send('Error: ' + e.message);
     }
@@ -39,7 +42,10 @@ authRouter.post('/login', async (req, res) => {
             res.cookie("token", token, {
                 expires: new Date(Date.now() + 8 * 3600000)
             });
-            res.send('Login successful');
+            res.json({
+                message: 'Login successful',
+                data: user
+            });
         } else {
             throw new Error('Invalid credentials');
         }
@@ -53,7 +59,10 @@ authRouter.post('/logout', (req, res) => {
     res.cookie('token', null, {
         expires: new Date(Date.now())
     });
-    res.send('Logged out successfully');
+    res.json({
+        message: 'Logged out successfully',
+        data: null
+    });
 });
 
 module.exports = { authRouter };
