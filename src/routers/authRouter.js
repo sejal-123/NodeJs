@@ -28,7 +28,6 @@ authRouter.post('/login', async (req, res) => {
         console.log(req.body);
         const { emailId, password } = req.body;
         const user = await User.findOne({ emailId: emailId });
-        console.log(user);
         if (!user) {
             throw new Error('Invalid credentials');
         }
@@ -38,20 +37,29 @@ authRouter.post('/login', async (req, res) => {
         if (isPasswordValid) {
             // create a jwt token
             const token = await user.getJwt();
-            console.log(token);
             res.cookie("token", token, {
                 expires: new Date(Date.now() + 8 * 3600000)
             });
+            const result = {
+                token,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                emailId: user.emailId,
+                gender: user.gender,
+                photoUrl: user.photoUrl,
+                age: user.age,
+                skills: user.skills,
+            }
             res.json({
                 message: 'Login successful',
-                data: user
+                data: result
             });
         } else {
             throw new Error('Invalid credentials');
         }
     }
     catch (e) {
-        res.status(400).send('Something went wrong ' + e.message);
+        res.status(401).send('Something went wrong ' + e.message);
     }
 });
 

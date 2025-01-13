@@ -92,22 +92,31 @@ userRouter.get('/user/feed', userAuthByCookies, async (req, res) => {
             data: users
         });
     } catch(e) {
-        res.status(400).json({
+        res.status(401).json({
             message: 'ERROR: ' + e.message
         });
     }
 });
 
-userRouter.get('/user/getAll', async (req, res) => {
+userRouter.get('/user/getActiveUser', userAuthByCookies, async (req, res) => {
     try {
-        const users = await User.find();
-        console.log(users);
+        const user = req.user;
+        console.log(user);
+        const result = {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            emailId: user.emailId,
+            gender: user.gender,
+            photoUrl: user.photoUrl,
+            age: user.age,
+            skills: user.skills
+        }
         res.json({
             message: 'Data fetched successfully',
-            data: users
+            data: result
         });
     } catch(e) {
-        res.status(400).json({
+        res.status(401).json({
             message: 'ERROR' + e.message
         });
     }

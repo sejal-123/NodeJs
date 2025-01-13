@@ -24,7 +24,7 @@ const userAuth = (req, res, next) => {
 const userAuthByCookies = async (req, res, next) => {
     try {
         const cookies = req.cookies;
-        const { token } = cookies;
+        const token = cookies.token || req.header('authorization');
         const decodedMessage = jwt.verify(token, 'DevTinder@512');
         const { _id } = decodedMessage;
         const user = await User.findById(_id);
