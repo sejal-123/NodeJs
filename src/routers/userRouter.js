@@ -10,7 +10,7 @@ userRouter.get('/user/requests/received', userAuthByCookies, async (req, res) =>
         const requests = await ConnectionRequest.find({
             toUserId: loggedInUser._id,
             status: 'interested'
-        }).populate('fromUserId', ['firstName', 'lastName']);
+        }).populate('fromUserId', ['firstName', 'lastName', 'photoUrl']);
         // this populate gives all the details of the reference table on the basis of the field we pass
         // It can also filter the fields to return like firstName and lastName if we specify it as second param in array
         // But if not specified, it just gives all the available fields from available keys on the basis of that field we provided as a first param 
@@ -32,8 +32,8 @@ userRouter.get('/user/connections', userAuthByCookies, async (req, res) => {
                 { fromUserId: loggedInUser._id, status: 'accepted' },
             ]
         })
-        .populate('fromUserId', ['firstName', 'lastName'])
-        .populate('toUserId', ['firstName', 'lastName']);
+        .populate('fromUserId', ['firstName', 'lastName', 'photoUrl'])
+        .populate('toUserId', ['firstName', 'lastName', 'photoUrl']);
         const requests = connectionRequests.map(request => {
             if (request.fromUserId._id.toString() === loggedInUser._id.toString()) {
                 return request.toUserId;
