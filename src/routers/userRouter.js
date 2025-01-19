@@ -61,7 +61,7 @@ userRouter.get('/user/feed', userAuthByCookies, async (req, res) => {
                 { fromUserId: loggedInUser._id },
                 { toUserId: loggedInUser._id }
             ]
-        }).select('fromUserId toUserId');
+        }).select('fromUserId toUserId photoUrl age skills');
         // }).select('fromUserId toUserId').populate('fromUserId', ['firstName', 'lastName']).populate('toUserId', ['firstName', 'lastName']); - just to show population
         // select function is user for returning only those fields provided in array
         // If we add - sign at front, then it will show all other fields excluding specified ones with - sign
@@ -79,7 +79,7 @@ userRouter.get('/user/feed', userAuthByCookies, async (req, res) => {
                 { _id: { $nin: Array.from(hideUsersFromUser) } },
                 { _id: { $ne: loggedInUser._id } }
             ]
-        }).select('firstName lastName').skip(skip).limit(limit);
+        }).select('firstName lastName photoUrl age skills').skip(skip).limit(limit);
         // We can also implement pagination here which is given by default from mongo db
         // we need to pass skip and limit method params
         // /user/feed?page=1&limit=10
